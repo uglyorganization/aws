@@ -3,7 +3,7 @@ name: 'Terraform destroy'
 on:
   workflow_dispatch:
     inputs:
-      name:
+      target:
         description: "what target to destroy"
         default: ""
 
