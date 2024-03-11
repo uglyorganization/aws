@@ -23,10 +23,15 @@ resource "aws_instance" "app_server" {
 }
 
 resource "aws_s3_bucket" "frontend" {
-  bucket = "frontend"
+  bucket = "frontend-${random_id.example.hex}"
+
 
   tags = {
     Name        = "FrontendBucket"
     Environment = "Dev"
   }
+}
+
+resource "random_id" "example" {
+  byte_length = 8
 }
