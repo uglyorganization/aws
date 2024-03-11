@@ -47,4 +47,4 @@ jobs:
     - name: Terraform Destroy target
       if: github.ref == 'refs/heads/main'
       run: |
-        terraform destroy --target ${{ github.event.inputs.target }}
+        terraform destroy -auto-approve --target ${{ github.event.inputs.target }}
