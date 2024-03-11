@@ -22,3 +22,11 @@ resource "aws_instance" "app_server" {
   }
 }
 
+resource "aws_s3_bucket" "frontend" {
+  bucket = "frontend"
+
+  tags = {
+    Name        = "FrontendBucket"
+    Environment = "Dev"
+  }
+}
