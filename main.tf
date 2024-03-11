@@ -23,7 +23,7 @@ resource "aws_instance" "app_server" {
 }
 
 resource "aws_s3_bucket" "frontend" {
-  bucket = "frontend-${random_id.frontend.hex}"
+  bucket = "frontend-0d1dd34408b06e29"
 
   tags = {
     Name        = "FrontendBucket"
@@ -49,10 +49,6 @@ resource "aws_s3_bucket_public_access_block" "frontend_public_access_block" {
   block_public_policy     = false
   ignore_public_acls      = false
   restrict_public_buckets = false
-}
-
-resource "random_id" "frontend" {
-  byte_length = 8
 }
 
 resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
