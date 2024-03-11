@@ -23,8 +23,7 @@ resource "aws_instance" "app_server" {
 }
 
 resource "aws_s3_bucket" "frontend" {
-  bucket = "frontend-${random_id.example.hex}"
-
+  bucket = "frontend-${random_id.frontend.hex}"
 
   tags = {
     Name        = "FrontendBucket"
@@ -32,6 +31,18 @@ resource "aws_s3_bucket" "frontend" {
   }
 }
 
-resource "random_id" "example" {
+resource "aws_s3_bucket_website_configuration" "frontend" {
+  bucket = aws_s3_bucket.frontend.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "error.html"
+  }
+}
+
+resource "random_id" "frontend" {
   byte_length = 8
 }
