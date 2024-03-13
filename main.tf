@@ -19,6 +19,11 @@ provider "aws" {
   region = "eu-west-1"
 }
 
+
+resource "random_id" "frontend" {
+  byte_length = 8
+}
+
 resource "random_id" "random" {
   byte_length = 8
 }
@@ -33,7 +38,7 @@ resource "aws_s3_bucket" "github-shared" {
 }
 
 resource "aws_s3_bucket" "frontend" {
-  bucket = "frontend-${random_id.random.hex}"
+  bucket = "frontend-${random_id.frontend.hex}"
 
   tags = {
     Name        = "FrontendBucket"
