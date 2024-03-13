@@ -19,14 +19,11 @@ provider "aws" {
   region = "eu-west-1"
 }
 
-
-resource "random_id" "frontend" {
-  byte_length = 8
-}
-
 resource "random_id" "random" {
   byte_length = 8
 }
+
+# GITHUB SHARED S3
 
 resource "aws_s3_bucket" "github-shared" {
   bucket = "github-shared-${random_id.random.hex}"
@@ -35,6 +32,69 @@ resource "aws_s3_bucket" "github-shared" {
     Name        = "GithubSharedBucket"
     Environment = "Dev"
   }
+}
+
+resource "aws_iam_policy" "github_shared_policy" {
+  name        = "github-shared-policy"
+  description = "Policy granting full access to the github-shared bucket"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:*",
+        ],
+        Resource = [
+          aws_s3_bucket.github-shared.arn,
+          "${aws_s3_bucket.github-shared.arn}/*",
+        ],
+      },
+    ],
+  })
+}
+
+resource "aws_iam_role" "github_shared_role" {
+  name               = "github-shared-role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::590184063820:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": "repo:uglyorganization/*"
+        }
+      }
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy_attachment" "github_shared_policy_attachment" {
+  name       = "github-shared-policy-attachment"
+  policy_arn = aws_iam_policy.github_shared_policy.arn
+  roles      = [aws_iam_role.github_shared_role.name]
+}
+
+output "github_shared_role_arn" {
+  value = aws_iam_role.github_shared_role.arn
+}
+
+# FRONTEND AND CDN
+
+resource "random_id" "frontend" {
+  byte_length = 8
 }
 
 resource "aws_s3_bucket" "frontend" {
