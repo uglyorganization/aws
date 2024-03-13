@@ -19,6 +19,11 @@ provider "aws" {
   region = "eu-west-1"
 }
 
+variable "AWS_ACCOUNT_ID" {
+  description = "AWS Account ID"
+  type        = string
+}
+
 resource "random_id" "random" {
   byte_length = 8
 }
