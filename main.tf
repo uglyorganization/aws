@@ -19,21 +19,21 @@ provider "aws" {
   region = "eu-west-1"
 }
 
-resource "aws_instance" "app_server" {
-  ami           = "ami-0fc3317b37c1269d3"
-  instance_type = "t2.micro"
-
-  tags = {
-    Name = "ExampleAppServerInstance"
-  }
-}
-
-resource "random_id" "frontend" {
+resource "random_id" "random" {
   byte_length = 8
 }
 
+resource "aws_s3_bucket" "github-shared" {
+  bucket = "github-shared-${random_id.random.hex}"
+
+  tags = {
+    Name        = "GithubSharedBucket"
+    Environment = "Dev"
+  }
+}
+
 resource "aws_s3_bucket" "frontend" {
-  bucket = "frontend-${random_id.frontend.hex}"
+  bucket = "frontend-${random_id.random.hex}"
 
   tags = {
     Name        = "FrontendBucket"
