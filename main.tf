@@ -37,13 +37,13 @@ resource "aws_s3_bucket" "github-shared" {
 resource "aws_iam_policy" "github_shared_policy" {
   name        = "github-shared-policy"
   description = "Policy granting full access to the github-shared bucket"
-  
+
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = [
+        Effect = "Allow",
+        Action = [
           "s3:*",
         ],
         Resource = [
