@@ -19,6 +19,11 @@ provider "aws" {
   region = "eu-west-1"
 }
 
+variable "AWS_ACCOUNT_ID" {
+  description = "AWS Account ID"
+  type        = string
+}
+
 resource "random_id" "random" {
   byte_length = 8
 }
@@ -64,7 +69,7 @@ resource "aws_iam_role" "github_shared_role" {
     {
       "Effect": "Allow",
       "Principal": {
-        "Federated": "arn:aws:iam::590184063820:oidc-provider/token.actions.githubusercontent.com"
+        "Federated": "arn:aws:iam::${var.AWS_ACCOUNT_ID}:oidc-provider/token.actions.githubusercontent.com"
       },
       "Action": "sts:AssumeRoleWithWebIdentity",
       "Condition": {
