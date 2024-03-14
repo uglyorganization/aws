@@ -28,19 +28,19 @@ resource "random_id" "random" {
   byte_length = 8
 }
 
-# GITHUB SHARED S3
+# github-shared S3
 
 resource "aws_s3_bucket" "github-shared" {
   bucket = "github-shared-${random_id.random.hex}"
 
   tags = {
-    Name        = "GithubSharedBucket"
+    Name        = "github-shared"
     Environment = "Dev"
   }
 }
 
-resource "aws_iam_policy" "github_shared_policy" {
-  name        = "github-shared-policy"
+resource "aws_iam_policy" "github_shared" {
+  name        = "github-shared"
   description = "Policy granting full access to the github-shared bucket"
 
   policy = jsonencode({
@@ -60,8 +60,8 @@ resource "aws_iam_policy" "github_shared_policy" {
   })
 }
 
-resource "aws_iam_role" "github_shared_role" {
-  name               = "github-shared-role"
+resource "aws_iam_role" "github_shared" {
+  name               = "github-shared"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -86,33 +86,29 @@ resource "aws_iam_role" "github_shared_role" {
 EOF
 }
 
-resource "aws_iam_policy_attachment" "github_shared_policy_attachment" {
-  name       = "github-shared-policy-attachment"
-  policy_arn = aws_iam_policy.github_shared_policy.arn
-  roles      = [aws_iam_role.github_shared_role.name]
+resource "aws_iam_policy_attachment" "github_shared" {
+  name       = "github-shared"
+  policy_arn = aws_iam_policy.github_shared.arn
+  roles      = [aws_iam_role.github_shared.name]
 }
 
 output "github_shared_role_arn" {
-  value = aws_iam_role.github_shared_role.arn
+  value = aws_iam_role.github_shared.arn
 }
 
-# FRONTEND AND CDN
+# frontend-dev and cdn
 
-resource "random_id" "frontend" {
-  byte_length = 8
-}
-
-resource "aws_s3_bucket" "frontend" {
-  bucket = "frontend-${random_id.frontend.hex}"
+resource "aws_s3_bucket" "frontend_dev" {
+  bucket = "frontend-dev-${random_id.random.hex}"
 
   tags = {
-    Name        = "FrontendBucket"
+    Name        = "frontend-dev"
     Environment = "Dev"
   }
 }
 
-resource "aws_s3_bucket_website_configuration" "frontend" {
-  bucket = aws_s3_bucket.frontend.id
+resource "aws_s3_bucket_website_configuration" "frontend_dev" {
+  bucket = aws_s3_bucket.frontend_dev.id
 
   index_document {
     suffix = "index.html"
@@ -123,16 +119,16 @@ resource "aws_s3_bucket_website_configuration" "frontend" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "frontend_public_access_block" {
-  bucket                  = aws_s3_bucket.frontend.id
+resource "aws_s3_bucket_public_access_block" "frontend_dev" {
+  bucket                  = aws_s3_bucket.frontend_dev.id
   block_public_acls       = false
   block_public_policy     = false
   ignore_public_acls      = false
   restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
-  bucket = aws_s3_bucket.frontend.id
+resource "aws_s3_bucket_policy" "frontend_dev" {
+  bucket = aws_s3_bucket.frontend_dev.id
   policy = jsonencode(
     {
       "Version" : "2012-10-17",
@@ -142,20 +138,20 @@ resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
           "Effect" : "Allow",
           "Principal" : "*",
           "Action" : "s3:GetObject",
-          "Resource" : "arn:aws:s3:::${aws_s3_bucket.frontend.id}/*"
+          "Resource" : "arn:aws:s3:::${aws_s3_bucket.frontend_dev.id}/*"
         }
       ]
     }
   )
 }
 
-resource "aws_cloudfront_distribution" "frontend_distribution" {
+resource "aws_cloudfront_distribution" "frontend_dev" {
   enabled         = true
   is_ipv6_enabled = true
 
   origin {
-    domain_name = aws_s3_bucket_website_configuration.frontend.website_endpoint
-    origin_id   = aws_s3_bucket.frontend.bucket_regional_domain_name
+    domain_name = aws_s3_bucket_website_configuration.frontend_dev.website_endpoint
+    origin_id   = aws_s3_bucket.frontend_dev.bucket_regional_domain_name
 
     custom_origin_config {
       http_port                = 80
@@ -186,19 +182,32 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     compress               = true
     allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = aws_s3_bucket.frontend.bucket_regional_domain_name
+    target_origin_id       = aws_s3_bucket.frontend_dev.bucket_regional_domain_name
   }
 }
 
+output "website_url" {
+  description = "Website URL (HTTPS)"
+  value       = aws_cloudfront_distribution.frontend_dev.domain_name
+}
+
+output "s3_url" {
+  description = "S3 hosting URL (HTTP)"
+  value       = aws_s3_bucket_website_configuration.frontend_dev.website_endpoint
+}
+
+
+# github frontend-dev 
+
 resource "aws_iam_policy" "github_frontend_dev" {
-  name        = "github_frontend_dev"
+  name        = "github-frontend-dev"
   description = "S3 management and CDN invalidation for frontend"
 
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        "Sid" : "FrontendS3AndCDNPolicy",
+        "Sid" : "github-frontend-dev",
         "Effect" : "Allow",
         "Action" : [
           "s3:PutObject",
@@ -207,9 +216,9 @@ resource "aws_iam_policy" "github_frontend_dev" {
           "cloudfront:CreateInvalidation"
         ],
         "Resource" : [
-          "arn:aws:cloudfront::${var.AWS_ACCOUNT_ID}:distribution/${aws_cloudfront_distribution.frontend_distribution.id}",
-          "arn:aws:s3:::${aws_s3_bucket.frontend.id}/*",
-          "arn:aws:s3:::${aws_s3_bucket.frontend.id}"
+          "arn:aws:cloudfront::${var.AWS_ACCOUNT_ID}:distribution/${aws_cloudfront_distribution.frontend_dev.id}",
+          "arn:aws:s3:::${aws_s3_bucket.frontend_dev.id}/*",
+          "arn:aws:s3:::${aws_s3_bucket.frontend_dev.id}"
         ]
       }
     ],
@@ -243,17 +252,7 @@ EOF
 }
 
 resource "aws_iam_policy_attachment" "github_frontend_dev" {
-  name       = "github-frontend-dev-policy-attachment"
+  name       = "github-frontend-dev"
   policy_arn = aws_iam_policy.github_frontend_dev.arn
   roles      = [aws_iam_role.github_frontend_dev.name]
-}
-
-output "website_url" {
-  description = "Website URL (HTTPS)"
-  value       = aws_cloudfront_distribution.frontend_distribution.domain_name
-}
-
-output "s3_url" {
-  description = "S3 hosting URL (HTTP)"
-  value       = aws_s3_bucket_website_configuration.frontend.website_endpoint
 }
