@@ -191,7 +191,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
 }
 
 resource "aws_iam_policy" "github_frontend_dev" {
-  name        = "github_frontend_dev "
+  name        = "github_frontend_dev"
   description = "S3 management and CDN invalidation for frontend"
 
   policy = jsonencode({
