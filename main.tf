@@ -217,7 +217,7 @@ resource "aws_iam_policy" "github_frontend_dev" {
                 "cloudfront:CreateInvalidation"
             ],
             "Resource": [
-                "arn:aws:cloudfront::${env.AWS_ACCOUNT_ID}:distribution/${aws_cloudfront_distribution.frontend_distribution.id}",
+                "arn:aws:cloudfront::${var.AWS_ACCOUNT_ID}:distribution/${aws_cloudfront_distribution.frontend_distribution.id}",
                 "arn:aws:s3:::${aws_s3_bucket.frontend.id}/*"
                 "arn:aws:s3:::${aws_s3_bucket.frontend.id}"
             ]
