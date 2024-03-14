@@ -190,16 +190,6 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
   }
 }
 
-output "website_url" {
-  description = "Website URL (HTTPS)"
-  value       = aws_cloudfront_distribution.frontend_distribution.domain_name
-}
-
-output "s3_url" {
-  description = "S3 hosting URL (HTTP)"
-  value       = aws_s3_bucket_website_configuration.frontend.website_endpoint
-}
-
 resource "aws_iam_policy" "github_frontend_dev" {
   name        = "FrontendS3AndCDNPolicy "
   description = "S3 management and CDN invalidation for frontend"
@@ -256,4 +246,14 @@ resource "aws_iam_policy_attachment" "github_frontend_dev" {
   name       = "github-frontend-dev-policy-attachment"
   policy_arn = aws_iam_policy.github_frontend_dev.arn
   roles      = [aws_iam_role.github_frontend_dev.name]
+}
+
+output "website_url" {
+  description = "Website URL (HTTPS)"
+  value       = aws_cloudfront_distribution.frontend_distribution.domain_name
+}
+
+output "s3_url" {
+  description = "S3 hosting URL (HTTP)"
+  value       = aws_s3_bucket_website_configuration.frontend.website_endpoint
 }
