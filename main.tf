@@ -188,7 +188,7 @@ resource "aws_cloudfront_distribution" "frontend_dev" {
 
 output "website_url" {
   description = "Website URL (HTTPS)"
-  value       = aws_cloudfront_distribution.frontend_distribution.domain_name
+  value       = aws_cloudfront_distribution.frontend_dev.domain_name
 }
 
 output "s3_url" {
