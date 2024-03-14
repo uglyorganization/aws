@@ -198,20 +198,20 @@ resource "aws_iam_policy" "github_frontend_dev" {
     Version = "2012-10-17",
     Statement = [
       {
-            "Sid": "FrontendS3AndCDNPolicy",
-            "Effect": "Allow",
-            "Action": [
-                "s3:PutObject",
-                "s3:ListBucket",
-                "s3:DeleteObject",
-                "cloudfront:CreateInvalidation"
-            ],
-            "Resource": [
-                "arn:aws:cloudfront::${var.AWS_ACCOUNT_ID}:distribution/${aws_cloudfront_distribution.frontend_distribution.id}",
-                "arn:aws:s3:::${aws_s3_bucket.frontend.id}/*"
-                "arn:aws:s3:::${aws_s3_bucket.frontend.id}"
-            ]
-        }
+        "Sid" : "FrontendS3AndCDNPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject",
+          "cloudfront:CreateInvalidation"
+        ],
+        "Resource" : [
+          "arn:aws:cloudfront::${var.AWS_ACCOUNT_ID}:distribution/${aws_cloudfront_distribution.frontend_distribution.id}",
+          "arn:aws:s3:::${aws_s3_bucket.frontend.id}/*",
+          "arn:aws:s3:::${aws_s3_bucket.frontend.id}"
+        ]
+      }
     ],
   })
 }
