@@ -107,7 +107,7 @@ resource "aws_s3_bucket" "frontend_dev" {
   }
 }
 
-resource "aws_s3_bucket_website_configuration" "frontend-dev" {
+resource "aws_s3_bucket_website_configuration" "frontend_dev" {
   bucket = aws_s3_bucket.frontend_dev.id
 
   index_document {
