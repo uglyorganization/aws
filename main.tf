@@ -199,3 +199,61 @@ output "s3_url" {
   description = "S3 hosting URL (HTTP)"
   value       = aws_s3_bucket_website_configuration.frontend.website_endpoint
 }
+
+resource "aws_iam_policy" "github_frontend_dev" {
+  name        = "FrontendS3AndCDNPolicy "
+  description = "S3 management and CDN invalidation for frontend"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+            "Sid": "FrontendS3AndCDNPolicy",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:ListBucket",
+                "s3:DeleteObject",
+                "cloudfront:CreateInvalidation"
+            ],
+            "Resource": [
+                "arn:aws:cloudfront::${env.AWS_ACCOUNT_ID}:distribution/${aws_cloudfront_distribution.frontend_distribution.id}",
+                "arn:aws:s3:::${aws_s3_bucket.frontend.id}/*"
+                "arn:aws:s3:::${aws_s3_bucket.frontend.id}"
+            ]
+        }
+    ],
+  })
+}
+
+resource "aws_iam_role" "github_frontend_dev" {
+  name               = "github-frontend-dev"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::${var.AWS_ACCOUNT_ID}:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": "repo:uglyorganization/frontend-dev:*"
+        }
+      }
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy_attachment" "github_frontend_dev" {
+  name       = "github-frontend-dev-policy-attachment"
+  policy_arn = aws_iam_policy.github_frontend_dev.arn
+  roles      = [aws_iam_role.github_frontend_dev.name]
+}
