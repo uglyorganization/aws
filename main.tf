@@ -207,7 +207,7 @@ resource "aws_iam_policy" "github_frontend_dev" {
     Version = "2012-10-17",
     Statement = [
       {
-        "Sid" : "github-frontend-dev",
+        "Sid" : "GithubFrontendDev",
         "Effect" : "Allow",
         "Action" : [
           "s3:PutObject",
