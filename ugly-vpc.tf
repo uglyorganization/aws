@@ -34,7 +34,7 @@ resource "aws_subnet" "ugly_org_public" {
 resource "aws_subnet" "ugly_org_private" {
   count             = length(var.availability_zones)
   vpc_id            = aws_vpc.ugly_org.id
-  cidr_block        = "10.0.${count.index + 101}.0/24"
+  cidr_block        = "10.0.${count.index + 4}.0/24"
   availability_zone = "${var.region}${var.availability_zones[count.index]}"
 
   tags = {

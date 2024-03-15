@@ -105,8 +105,8 @@ resource "aws_autoscaling_group" "backend_lxd" {
 }
 
 resource "aws_elb" "backend_lxd" {
-  name               = "backend-lxd"
-  availability_zones = ["${var.region}a"]
+  name    = "backend-lxd"
+  subnets = aws_subnet.ugly_org_public[*].id
 
   listener {
     instance_port     = 80
