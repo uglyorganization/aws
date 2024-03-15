@@ -6,26 +6,29 @@ resource "aws_iam_policy" "github_backend_lxd" {
 
   policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [{
-      Effect = "Allow",
-      Action = [
-        "ssm:SendCommand",
-        "ssm:GetCommandInvocation",
-        "ssm:ListCommands",
-        "ssm:ListCommandInvocations"
-      ],
-      Resource = [
-        "arn:aws:ssm:${var.region}:document/AWS-RunShellScript",
-        "arn:aws:ssm:${var.region}:${var.AWS_ACCOUNT_ID}:instance/*",
-      ],
-      Condition = {
-        StringLike = {
-          "ec2:ResourceTag/Application" : "BackendLXD"
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation",
+          "ssm:ListCommands",
+          "ssm:ListCommandInvocations"
+        ],
+        Resource = [
+          "arn:aws:ssm:${var.region}::document/AWS-RunShellScript", # Corrected ARN for AWS-RunShellScript
+          "arn:aws:ec2:${var.region}:${var.AWS_ACCOUNT_ID}:instance/*"
+        ],
+        Condition = {
+          StringLike = {
+            "ec2:ResourceTag/Application" : "BackendLXD"
+          }
         }
       }
-    }]
+    ]
   })
 }
+
 
 resource "aws_iam_role" "github_backend_lxd" {
   name = "github-backend-lxd"
