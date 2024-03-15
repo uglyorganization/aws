@@ -19,6 +19,12 @@ provider "aws" {
   region = "eu-west-1"
 }
 
+variable "region" {
+  description = "AWS region"
+  type        = string
+  default     = "eu-west-1"
+}
+
 variable "AWS_ACCOUNT_ID" {
   description = "AWS Account ID"
   type        = string
