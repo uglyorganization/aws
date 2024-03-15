@@ -61,7 +61,3 @@ resource "aws_iam_policy_attachment" "github_shared" {
   policy_arn = aws_iam_policy.github_shared.arn
   roles      = [aws_iam_role.github_shared.name]
 }
-
-output "github_shared_role_arn" {
-  value = aws_iam_role.github_shared.arn
-}

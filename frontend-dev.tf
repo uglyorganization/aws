@@ -93,11 +93,6 @@ output "website_url" {
   value       = aws_cloudfront_distribution.frontend_dev.domain_name
 }
 
-output "s3_url" {
-  description = "S3 hosting URL (HTTP)"
-  value       = aws_s3_bucket_website_configuration.frontend_dev.website_endpoint
-}
-
 # github frontend-dev 
 
 resource "aws_iam_policy" "github_frontend_dev" {
