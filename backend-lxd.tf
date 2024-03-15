@@ -81,7 +81,7 @@ resource "aws_security_group" "backend_lxd" {
 
 resource "aws_launch_configuration" "backend_lxd" {
   name_prefix     = "backend-lxd-"
-  image_id        = "ami-0c02fb55956c7d316"
+  image_id        = "ami-0fc3317b37c1269d3"
   instance_type   = "t2.micro"
   security_groups = [aws_security_group.backend_lxd.id]
 
