@@ -8,17 +8,21 @@ resource "aws_iam_policy" "github_backend_lxd" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid : "GithubBackendLXD",
-        Effect = "Allow",
-        Action = [
+        Sid : "SSMDocumentPermission",
+        Effect : "Allow",
+        Action : "ssm:SendCommand",
+        Resource : "arn:aws:ssm:${var.region}::document/AWS-RunShellScript"
+      },
+      {
+        Sid : "EC2InstancePermission",
+        Effect : "Allow",
+        Action : [
           "ssm:SendCommand",
+          "ssm:GetCommandInvocation"
         ],
-        Resource = [
-          "arn:aws:ssm:${var.region}::document/AWS-RunShellScript", # Corrected ARN for AWS-RunShellScript
-          "arn:aws:ec2:${var.region}:${var.AWS_ACCOUNT_ID}:instance/*"
-        ],
-        Condition = {
-          StringEquals = {
+        Resource : "arn:aws:ec2:${var.region}:${var.AWS_ACCOUNT_ID}:instance/*",
+        Condition : {
+          StringLike : {
             "ec2:ResourceTag/Name" : "BackendLXD"
           }
         }
