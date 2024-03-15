@@ -11,7 +11,8 @@ resource "aws_iam_policy" "github_backend_lxd" {
         Sid : "GithubBackendLXD",
         Effect = "Allow",
         Action = [
-          "ssm:SendCommand"
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation"
         ],
         Resource = [
           "arn:aws:ssm:${var.region}::document/AWS-RunShellScript", # Corrected ARN for AWS-RunShellScript
