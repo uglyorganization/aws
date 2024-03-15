@@ -95,7 +95,7 @@ resource "aws_autoscaling_group" "backend_lxd" {
   min_size             = 1
   max_size             = 1 # Start with 1 instance in the free tier
   desired_capacity     = 1
-  vpc_zone_identifier  = [aws_subnet.ugly_org_subnet.id]
+  vpc_zone_identifier  = aws_subnet.ugly_org_public[*].id
 
   tag {
     key                 = "Name"
