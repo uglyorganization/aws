@@ -21,7 +21,7 @@ resource "aws_iam_policy" "github_backend_lxd" {
         ],
         Condition = {
           StringLike = {
-            "ec2:ResourceTag/Application" : "BackendLXD"
+            "ec2:ResourceTag/Name" : "BackendLXD"
           }
         }
       }
