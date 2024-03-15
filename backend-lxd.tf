@@ -12,14 +12,13 @@ resource "aws_iam_policy" "github_backend_lxd" {
         Effect = "Allow",
         Action = [
           "ssm:SendCommand",
-          "ssm:GetCommandInvocation"
         ],
         Resource = [
           "arn:aws:ssm:${var.region}::document/AWS-RunShellScript", # Corrected ARN for AWS-RunShellScript
           "arn:aws:ec2:${var.region}:${var.AWS_ACCOUNT_ID}:instance/*"
         ],
         Condition = {
-          StringLike = {
+          StringEquals = {
             "ec2:ResourceTag/Name" : "BackendLXD"
           }
         }
