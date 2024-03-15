@@ -42,3 +42,34 @@ resource "aws_subnet" "ugly_org_private" {
   }
 }
 
+# An Internet Gateway is necessary for allowing communication between resources in your VPC and the internet
+# which is essential for a public-facing ELB.
+resource "aws_internet_gateway" "ugly_org" {
+  vpc_id = aws_vpc.ugly_org.id
+
+  tags = {
+    Name = "UglyOrgIGW"
+  }
+}
+
+# VPC table that routes traffic destined for the internet (0.0.0.0/0) to the igw
+resource "aws_route_table" "ugly_org_public_rt" {
+  vpc_id = aws_vpc.ugly_org.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.ugly_org.id
+  }
+
+  tags = {
+    Name = "UglyOrgPublicRT"
+  }
+}
+
+# associate the route table with your public subnets to ensure instances within those subnets can access the internet:
+resource "aws_route_table_association" "ugly_org_public_rta" {
+  count = length(aws_subnet.ugly_org_public[*].id)
+
+  subnet_id      = aws_subnet.ugly_org_public[count.index].id
+  route_table_id = aws_route_table.ugly_org_public_rt.id
+}
