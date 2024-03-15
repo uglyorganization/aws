@@ -174,6 +174,10 @@ resource "aws_launch_template" "backend_lxd" {
 
   user_data = base64encode(file("${path.module}/user_data.sh"))
 
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2_ssm_instance_profile.name
+  }
+
   network_interfaces {
     associate_public_ip_address = true
     security_groups             = [aws_security_group.backend_lxd.id]
