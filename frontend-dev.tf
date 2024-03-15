@@ -147,8 +147,7 @@ resource "aws_iam_role" "github_frontend_dev" {
 EOF
 }
 
-resource "aws_iam_policy_attachment" "github_frontend_dev" {
-  name       = "github-frontend-dev"
+resource "aws_iam_role_policy_attachment" "github_frontend_dev" {
+  role       = aws_iam_role.github_frontend_dev.name
   policy_arn = aws_iam_policy.github_frontend_dev.arn
-  roles      = [aws_iam_role.github_frontend_dev.name]
 }

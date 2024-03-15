@@ -52,9 +52,8 @@ resource "aws_iam_role" "github_backend_lxd" {
   })
 }
 
-resource "aws_iam_policy_attachment" "github_backend_lxd" {
-  name       = "github-backend-lxd-ssm-attach"
-  roles      = [aws_iam_role.github_backend_lxd.name]
+resource "aws_iam_role_policy_attachment" "github_backend_lxd_ssm_attach" {
+  role       = aws_iam_role.github_backend_lxd.name
   policy_arn = aws_iam_policy.github_backend_lxd.arn
 }
 
