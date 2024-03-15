@@ -75,7 +75,7 @@ resource "aws_iam_role" "ec2_ssm_role" {
 }
 
 resource "aws_iam_policy" "ssm_policy" {
-  name   = "ssm_policy"
+  name       = "ssm_policy"
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
