@@ -79,6 +79,52 @@ resource "aws_security_group" "backend_lxd" {
   }
 }
 
+resource "aws_lb" "backend_lxd" {
+  name               = "backend-lxd"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.backend_lxd.id]
+  subnets            = aws_subnet.ugly_org_public[*].id
+
+  enable_deletion_protection = false
+
+  tags = {
+    Name = "BackendLXD"
+  }
+}
+
+resource "aws_lb_target_group" "backend_lxd" {
+  name     = "backend-lxd"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.ugly_org.id
+
+  health_check {
+    protocol            = "HTTP"
+    path                = "/health"
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+    timeout             = 5
+    interval            = 30
+    matcher             = "200"
+  }
+
+  tags = {
+    Name = "BackendLXD"
+  }
+}
+
+resource "aws_lb_listener" "backend_lxd" {
+  load_balancer_arn = aws_lb.backend_lxd.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend_lxd.arn
+  }
+}
+
 resource "aws_launch_template" "backend_lxd" {
   name_prefix   = "backend-lxd-"
   image_id      = "ami-0fc3317b37c1269d3"
@@ -112,6 +158,8 @@ resource "aws_autoscaling_group" "backend_lxd" {
   desired_capacity    = 1
   vpc_zone_identifier = aws_subnet.ugly_org_public[*].id
 
+  target_group_arns = [aws_lb_target_group.backend_lxd.arn]
+
   tag {
     key                 = "Name"
     value               = "BackendLXD"
@@ -119,36 +167,6 @@ resource "aws_autoscaling_group" "backend_lxd" {
   }
 }
 
-resource "aws_elb" "backend_lxd" {
-  name    = "backend-lxd"
-  subnets = aws_subnet.ugly_org_public[*].id
-
-  listener {
-    instance_port     = 80
-    instance_protocol = "HTTP"
-    lb_port           = 80
-    lb_protocol       = "HTTP"
-  }
-
-  health_check {
-    target              = "HTTP:80/health"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
-
-  instances                   = [aws_autoscaling_group.backend_lxd.id]
-  cross_zone_load_balancing   = true
-  idle_timeout                = 400
-  connection_draining         = true
-  connection_draining_timeout = 400
-
-  tags = {
-    Name = "BackendLXD"
-  }
-}
-
-output "backend_lxd_elb_dns_name" {
-  value = aws_elb.backend_lxd.dns_name
+output "backend_lxd_alb_dns_name" {
+  value = aws_lb.backend_lxd.dns_name
 }
