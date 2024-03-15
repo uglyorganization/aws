@@ -11,9 +11,12 @@ resource "aws_iam_policy" "github_backend_lxd" {
         Effect = "Allow",
         Action = [
           "ssm:SendCommand",
+          "ssm:GetCommandInvocation",
+          "ssm:ListCommands",
+          "ssm:ListCommandInvocations"
         ],
         Resource = [
-          "arn:aws:ssm:${var.region}:${var.AWS_ACCOUNT_ID}:document/AWS-RunShellScript",
+          "arn:aws:ssm:${var.region}:document/AWS-RunShellScript",
           "arn:aws:ssm:${var.region}:${var.AWS_ACCOUNT_ID}:instance/*",
         ],
         Condition = {
