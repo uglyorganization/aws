@@ -79,11 +79,22 @@ resource "aws_security_group" "backend_lxd" {
   }
 }
 
-resource "aws_launch_configuration" "backend_lxd" {
-  name_prefix     = "backend-lxd-"
-  image_id        = "ami-0fc3317b37c1269d3"
-  instance_type   = "t2.micro"
-  security_groups = [aws_security_group.backend_lxd.id]
+resource "aws_launch_template" "backend_lxd" {
+  name_prefix   = "backend-lxd-"
+  image_id      = "ami-0fc3317b37c1269d3"
+  instance_type = "t2.micro"
+
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups             = [aws_security_group.backend_lxd.id]
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Name = "BackendLXD"
+    }
+  }
 
   lifecycle {
     create_before_destroy = true
@@ -91,11 +102,15 @@ resource "aws_launch_configuration" "backend_lxd" {
 }
 
 resource "aws_autoscaling_group" "backend_lxd" {
-  launch_configuration = aws_launch_configuration.backend_lxd.name
-  min_size             = 1
-  max_size             = 1 # Start with 1 instance in the free tier
-  desired_capacity     = 1
-  vpc_zone_identifier  = aws_subnet.ugly_org_public[*].id
+  launch_template {
+    id      = aws_launch_template.backend_lxd.id
+    version = "$Latest"
+  }
+
+  min_size            = 1
+  max_size            = 1 # Start with 1 instance in the free tier
+  desired_capacity    = 1
+  vpc_zone_identifier = aws_subnet.ugly_org_public[*].id
 
   tag {
     key                 = "Name"
