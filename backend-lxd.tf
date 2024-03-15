@@ -74,15 +74,9 @@ resource "aws_iam_role" "ec2_ssm_role" {
   })
 }
 
-resource "aws_iam_policy" "ssm_policy" {
-  name       = "ssm_policy"
+resource "aws_iam_role_policy_attachment" "ssm_managed_core_attachment" {
+  role       = aws_iam_role.ec2_ssm_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-resource "aws_iam_policy_attachment" "ssm_policy_attach" {
-  name       = "ssm_policy_attach"
-  roles      = [aws_iam_role.ec2_ssm_role.name]
-  policy_arn = aws_iam_policy.ssm_policy.arn
 }
 
 resource "aws_iam_instance_profile" "ec2_ssm_instance_profile" {
