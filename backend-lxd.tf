@@ -156,9 +156,10 @@ resource "aws_lb_listener" "backend_lxd" {
 }
 
 resource "aws_launch_template" "backend_lxd" {
-  name_prefix   = "backend-lxd-"
-  image_id      = "ami-074254c177d57d640"
-  instance_type = "t2.micro"
+  name_prefix            = "backend-lxd-"
+  image_id               = "ami-074254c177d57d640"
+  instance_type          = "t2.micro"
+  update_default_version = true
 
   user_data = base64encode(file("${path.module}/user_data.sh"))
 
