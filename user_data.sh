@@ -11,6 +11,3 @@ systemctl start docker
 
 # Enable Docker to start on boot
 systemctl enable docker
-
-# If you plan to use Docker without sudo (optional)
-usermod -aG docker ssm-user
