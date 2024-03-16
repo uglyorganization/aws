@@ -13,4 +13,4 @@ systemctl start docker
 systemctl enable docker
 
 # If you plan to use Docker without sudo (optional)
-usermod -aG docker ec2-user
+usermod -aG docker ssm-user
